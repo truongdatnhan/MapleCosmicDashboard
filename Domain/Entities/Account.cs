@@ -39,5 +39,7 @@ namespace Domain.Entities
         public int VotePoints { get; set; }
         public string Hwid { get; set; } = string.Empty;
         public int Language { get; set; }
+        public int Streak { get; set; }
+        public DateTime? LastRedeem { get; set; }
     }
 }

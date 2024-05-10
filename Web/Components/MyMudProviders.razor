@@ -8,9 +8,14 @@
     protected override void OnInitialized()
     {
         Snackbar.Clear();
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
+        Snackbar.Configuration.PreventDuplicates = false;
         Snackbar.Configuration.MaxDisplayedSnackbars = 5;
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
-        Snackbar.Configuration.PreventDuplicates = true;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Configuration.ShowCloseIcon = true;
+        Snackbar.Configuration.VisibleStateDuration = 1000;
+        Snackbar.Configuration.HideTransitionDuration = 500;
+        Snackbar.Configuration.ShowTransitionDuration = 500;
     }
 }
