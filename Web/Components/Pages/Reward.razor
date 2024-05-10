@@ -1,0 +1,73 @@
+﻿@page "/reward"
+@attribute [Authorize]
+
+<PageTitle>Reward</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="8">
+        <MudPaper Height="100%">
+            <MudText Typo="Typo.h5" Class="pt-4 pb-12" Align="Align.Center">Daily Streak</MudText>
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
+                <MudTimelineItem Color="FirstGoalLine" Variant="Variant.Filled">
+                    <ItemContent>
+                        <MudAlert Severity="FirstGoalText" ContentAlignment="HorizontalAlignment.Center" Variant="Variant.Filled">500 NX</MudAlert>
+                    </ItemContent>
+                    <ItemOpposite>
+                        <MudText Color="FirstGoalLine">1 day</MudText>
+                    </ItemOpposite>
+                </MudTimelineItem>
+                <MudTimelineItem Color="SecondGoalLine" Variant="Variant.Filled" TimelineAlign="TimelineAlign.End">
+                    <ItemContent>
+                        <MudAlert Severity="SecondGoalText" ContentAlignment="HorizontalAlignment.Center" Variant="Variant.Filled">700 NX</MudAlert>
+                    </ItemContent>
+                    <ItemOpposite>
+                        <MudText Color="SecondGoalLine">14 days</MudText>
+                    </ItemOpposite>
+                </MudTimelineItem>
+                <MudTimelineItem Color="ThirdGoalLine" Variant="Variant.Filled">
+                    <ItemContent>
+                        <MudAlert Severity="ThirdGoalText" ContentAlignment="HorizontalAlignment.Center" Variant="Variant.Filled">1000 NX</MudAlert>
+                    </ItemContent>
+                    <ItemOpposite>
+                        <MudText Color="ThirdGoalLine">30+ days</MudText>
+                    </ItemOpposite>
+                </MudTimelineItem>
+            </MudTimeline>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <MudStack Spacing="4">
+            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4">
+                <MudText Typo="Typo.h5">Daily Claim</MudText>
+                <MudText Typo="Typo.body1">Daily reward reset at 12:00 AM everyday.</MudText>
+                <MudText Typo="Typo.body2">Don't miss your daily reward ;).</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">CLAIM !</MudButton>
+            </MudPaper>
+
+            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4">
+                <MudText Typo="Typo.h5">Enter coupon</MudText>
+                <MudTextField FullWidth="true" T="string" Label="Coupon" Variant="Variant.Outlined" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">REDEEM</MudButton>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private int currentCount = 0;
+
+    private int consecutiveCount = 15;
+
+    private Color FirstGoalLine => consecutiveCount >= 1 ? Color.Success : Color.Default;
+    private Severity FirstGoalText => FirstGoalLine == Color.Success ? Severity.Success : Severity.Info;
+    private Color SecondGoalLine => consecutiveCount >= 14 ? Color.Success : Color.Default;
+    private Severity SecondGoalText => SecondGoalLine == Color.Success ? Severity.Success : Severity.Info;
+    private Color ThirdGoalLine => consecutiveCount >= 30 ? Color.Success : Color.Default;
+    private Severity ThirdGoalText => ThirdGoalLine == Color.Success ? Severity.Success : Severity.Info;
+
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

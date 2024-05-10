@@ -1,0 +1,112 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="4">
+        <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+            <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Color="MudBlazor.Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+            <div>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">MESO RATE</MudText>
+                <MudText Typo="Typo.h5">1x</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+            <MudIcon Icon="@Icons.Material.Filled.Layers" Color="MudBlazor.Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+            <div>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">EXP RATE</MudText>
+                <MudText Typo="Typo.h5">1x</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+            <MudIcon Icon="@Icons.Material.Filled.Public" Color="MudBlazor.Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+            <div>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Player Online</MudText>
+                <MudText Typo="Typo.h5">100</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert="true">
+        <MudItem xs="12">
+            <MudCarousel Class="mud-width-full" Style="height:300px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+                <MudCarouselItem Transition="transition">
+                    <MudImage Src="images/carousel_1.png" Alt="Banner 1" />
+                </MudCarouselItem>
+                <MudCarouselItem Transition="transition">
+                    <MudImage Src="images/carousel_2.png" Alt="Banner 2" />
+                </MudCarouselItem>
+                <MudCarouselItem Transition="transition">
+                    <MudImage Src="images/carousel_3.png" Alt="Banner 3" />
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudItem>
+    </MudHidden>
+    <MudItem xs="12" sm="6">
+        <MudPaper Height="100%">
+            <MudTable Items="@characters" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">TOP NX</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Rank</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Level</MudTh>
+                    <MudTh>Job</MudTh>
+                    <MudTh>NX</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Rank">@context.Rank</MudTd>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Level">@context.Level</MudTd>
+                        <MudTd DataLabel="Job">@context.Job</MudTd>
+                        <MudTd DataLabel="NX">@context.Amount.ToString("#,0.##")</MudTd>
+                    </RowTemplate>
+                </MudTable>
+
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudPaper Height="100%">
+                <MudTable Items="@characters" Hover="true">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">TOP RIZZ</MudText>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Rank</MudTh>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Level</MudTh>
+                        <MudTh>Job</MudTh>
+                        <MudTh>Fame</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Rank">@context.Rank</MudTd>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Level">@context.Level</MudTd>
+                        <MudTd DataLabel="Job">@context.Job</MudTd>
+                        <MudTd DataLabel="Fame">@context.Amount.ToString("#,0.##")</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @code {
+    private Transition transition = Transition.Slide;
+    private List<CharacterData> characters = default!;
+
+    protected override void OnInitialized()
+    {
+        characters = new();
+        characters.Add(new(1, "Example 1", 200, "Knight", 100000));
+        characters.Add(new(2, "Example 2", 200, "Knight", 100000));
+        characters.Add(new(3, "Example 3", 200, "Knight", 100000));
+        characters.Add(new(4, "Example 4", 200, "Knight", 100000));
+    }
+
+
+    record CharacterData(int Rank, string Name, int Level, string Job, int Amount);
+}

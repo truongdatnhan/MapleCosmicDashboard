@@ -1,0 +1,68 @@
+﻿@page "/account/login"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Web.Components.Layout
+@layout AuthLayout
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login</PageTitle>
+
+<MudPaper Class="align-content-center pa-4" Height="100%">
+    <MudStack AlignItems="AlignItems.Center">
+        <MudAvatar Style="background-color:unset; height:150px; width:250px">
+            <MudImage Src="images/mushroom.png" Alt="Game logo" />
+        </MudAvatar>
+        <MudText Typo="Typo.h5">Login</MudText>
+        <MudText Typo="Typo.subtitle1">Enter your credentials</MudText>
+    </MudStack>
+    <EditForm Model="@Model" OnValidSubmit="OnValidSubmit" FormName="LoginForm">
+        <DataAnnotationsValidator />
+        <MudCardContent>
+            <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)" 
+                name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
+             <MudTextField T="string" Label="Password" InputType="InputType.Password" @bind-Value="Model.Password"
+                           For="@(() => Model.Password)" name="Model.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Login</MudButton>
+        </MudCardActions>
+    </EditForm>
+</MudPaper>
+
+
+ @code {
+    [SupplyParameterFromForm]
+    LoginVM Model { get; set; } = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var identity = new ClaimsIdentity(new[]
+            {
+            new Claim(ClaimTypes.Sid, "1"),
+            new Claim(ClaimTypes.Name, "test"),
+            new Claim(ClaimTypes.Role, 1 == 1 ? "Admin" : "User")
+            }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        NavigationManager.NavigateTo("/", true, true);
+    }
+
+    public class LoginVM
+    {
+        [Required]
+        [StringLength(13, ErrorMessage = "Username length can't be more than 13.")]
+        public string? Username { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
+        public string? Password { get; set; }
+    }
+
+}

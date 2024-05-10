@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+@using Web.Components
+
+<MyMudThemeProvider />
+<MyMudProviders />
+
+<style>
+    #background-video {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+</style>
+
+<MudLayout>
+    <MudMainContent>
+        <video id="background-video" autoplay loop muted>
+            <source src="videos/background.mp4" type="video/mp4">
+        </video>
+        <MudContainer MaxWidth="MaxWidth.Small" Class="my-8 pt-8">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

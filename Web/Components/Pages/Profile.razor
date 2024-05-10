@@ -1,0 +1,53 @@
+﻿@page "/profile"
+
+
+<PageTitle>Profile</PageTitle>
+
+<MudPaper Class="d-flex flex-row" Elevation="2" Height="100%">
+    <MudStack Row="true" Class="flex-auto flex-wrap pa-4" AlignItems="AlignItems.Center">
+        <MudText Class="pa-4" Style="flex: 0 1 100%" Typo="Typo.h5">Information</MudText>
+        <MudForm Class="flex-1">
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudAvatar Style="background-color:unset; height:150px; width:150px">
+                    <MudImage Src="images/avatar.png" Alt="Avatar" />
+                </MudAvatar>
+                <MudStack Class="flex-1" Justify="Justify.Center" Spacing="0">
+                    <MudTextField T="string" Label="Username" Variant="Variant.Outlined" />
+                    <MudTextField T="string" Label="Email" Variant="Variant.Outlined" />
+                </MudStack>
+            </MudStack>
+            <MudStack Row="true" Spacing="4">
+                <MudDatePicker Label="Birthday" @bind-Date="date2" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="Enter your date of birth" Variant="Variant.Outlined" Editable="true" />
+                <MudSelect T="string" Label="Gender" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("male")">Male</MudSelectItem>
+                    <MudSelectItem Value="@("female")">Female</MudSelectItem>
+                </MudSelect>
+            </MudStack>
+            <div class="d-flex align-center justify-space-between">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="flex-1 mt-4">Save</MudButton>
+            </div>
+        </MudForm>
+    </MudStack>
+    <MudDivider Vertical="true" FlexItem="true" />
+    <MudStack Class="pa-4">
+        <MudText Class="pa-4" Typo="Typo.h5">Security</MudText>
+        <MudStack Row="true" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.subtitle1">Change password</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+        </MudStack>
+        <MudStack Row="true" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.subtitle1">Change PIC</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private int currentCount = 0;
+    DateTime? date2 = DateTime.Today;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

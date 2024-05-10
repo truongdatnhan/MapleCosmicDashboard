@@ -1,0 +1,76 @@
+﻿@page "/account/register"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Web.Components.Layout
+@layout AuthLayout
+@inject NavigationManager NavigationManager
+
+<PageTitle>Register</PageTitle>
+
+<MudPaper Class="align-content-center pa-4" Height="100%">
+    <MudStack AlignItems="AlignItems.Center">
+        <MudAvatar Style="background-color:unset; height:150px; width:250px">
+            <MudImage Src="images/mushroom.png" Alt="Game logo" />
+        </MudAvatar>
+        <MudText Typo="Typo.h5">Register</MudText>
+        <MudText Typo="Typo.subtitle1">Create a new account</MudText>
+    </MudStack>
+    <EditForm Model="@Model" OnValidSubmit="OnValidSubmit" FormName="RegisterForm">
+        <DataAnnotationsValidator />
+        <MudCardContent>
+            <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)" name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
+             <MudTextField T="string" Label="Email" @bind-Value="Model.Email" For="@(() => Model.Email)" name="Model.Email" InputType="InputType.Email" Variant="Variant.Outlined" Placeholder="Enter your email" ShrinkLabel />
+             <MudTextField T="string" Label="Password" @bind-Value="Model.Password" For="@(() => Model.Password)" name="Model.Password" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
+             <MudTextField T="string" Label="Password" @bind-Value="Model.Password2" For="@(() => Model.Password2)" name="Model.Password2" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Repeat your username" ShrinkLabel />
+         </MudCardContent>
+         <MudCardActions>
+             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Register</MudButton>
+         </MudCardActions>
+     </EditForm>
+ </MudPaper>
+
+
+ @code {
+    [SupplyParameterFromForm]
+    RegisterVM Model { get; set; } = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var identity = new ClaimsIdentity(new[]
+            {
+            new Claim(ClaimTypes.Sid, "1"),
+            new Claim(ClaimTypes.Name, "test"),
+            new Claim(ClaimTypes.Role, 1 == 1 ? "Admin" : "User")
+            }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        NavigationManager.NavigateTo("/", true, true);
+    }
+
+    public class RegisterVM
+    {
+        [Required]
+        [StringLength(13, ErrorMessage = "Username length can't be more than 13.")]
+        public string? Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string? Email { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
+        public string? Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string? Password2 { get; set; }
+    }
+
+}
