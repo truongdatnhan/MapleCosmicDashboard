@@ -1,11 +1,19 @@
 ﻿@page "/reward"
+@using Application.Accounts.Query
+@using Application.Coupons.Command
+@using Application.Coupons.Query
+@using Domain.Entities
+@using MediatR
 @attribute [Authorize]
+@inject IMediator Mediator
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Reward</PageTitle>
 
 <MudGrid>
     <MudItem xs="12" sm="8">
-        <MudPaper Height="100%">
+        <MudPaper Height="100%" Elevation="4">
             <MudText Typo="Typo.h5" Class="pt-4 pb-12" Align="Align.Center">Daily Streak</MudText>
             <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
                 <MudTimelineItem Color="FirstGoalLine" Variant="Variant.Filled">
@@ -37,37 +45,110 @@
     </MudItem>
     <MudItem xs="12" sm="4">
         <MudStack Spacing="4">
-            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4">
+            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4" Elevation="4">
                 <MudText Typo="Typo.h5">Daily Claim</MudText>
                 <MudText Typo="Typo.body1">Daily reward reset at 12:00 AM everyday.</MudText>
                 <MudText Typo="Typo.body2">Don't miss your daily reward ;).</MudText>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">CLAIM !</MudButton>
+                <MudButton OnClick="Claim" Disabled="!canClaim" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">CLAIM !</MudButton>
             </MudPaper>
 
-            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4">
+            <MudPaper Class="d-flex gap-4 flex-column align-center pa-4" Elevation="4">
                 <MudText Typo="Typo.h5">Enter coupon</MudText>
-                <MudTextField FullWidth="true" T="string" Label="Coupon" Variant="Variant.Outlined" />
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">REDEEM</MudButton>
+                <MudTextField FullWidth="true" T="string" @bind-Value="couponInput" Label="Coupon" Variant="Variant.Outlined"
+                              Required="true" RequiredError="Coupon code is required" OnlyValidateIfDirty="true" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Redeem">REDEEM</MudButton>
             </MudPaper>
         </MudStack>
     </MudItem>
 </MudGrid>
 
 @code {
-    private int currentCount = 0;
+    private Account? user;
+    private string? couponInput;
+    private bool canClaim;
 
-    private int consecutiveCount = 15;
-
-    private Color FirstGoalLine => consecutiveCount >= 1 ? Color.Success : Color.Default;
+    private Color FirstGoalLine => user != null && user.Streak >= 1 ? Color.Success : Color.Default;
     private Severity FirstGoalText => FirstGoalLine == Color.Success ? Severity.Success : Severity.Info;
-    private Color SecondGoalLine => consecutiveCount >= 14 ? Color.Success : Color.Default;
+    private Color SecondGoalLine => user != null && user.Streak >= 14 ? Color.Success : Color.Default;
     private Severity SecondGoalText => SecondGoalLine == Color.Success ? Severity.Success : Severity.Info;
-    private Color ThirdGoalLine => consecutiveCount >= 30 ? Color.Success : Color.Default;
+    private Color ThirdGoalLine => user != null && user.Streak >= 30 ? Color.Success : Color.Default;
     private Severity ThirdGoalText => ThirdGoalLine == Color.Success ? Severity.Success : Severity.Info;
 
-
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdentity = authState.User;
+
+        user = await Mediator.Send(new GetAccountQuery(1));
+        if (user == null)
+        {
+            Snackbar.Add("Unknown error, reload page", Severity.Error);
+            return;
+        }
+
+        canClaim = user.LastRedeem.HasValue ? DateTime.Now.Date != user.LastRedeem.Value.Date : true;
+    }
+
+    private async Task Claim()
+    {
+        try
+        {
+            var coupon = await Mediator.Send(new InsertCouponCommand(1, 500));
+
+            if (coupon == null)
+            {
+                throw new Exception("Unkown error when claim");
+            }
+
+            var result = await Mediator.Send(new RedeemCouponCommand(1, coupon, 500));
+
+            if (result)
+            {
+                canClaim = false;
+                Snackbar.Add("Claim successfully", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Claim failed", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task Redeem()
+    {
+        try
+        {
+            if(string.IsNullOrWhiteSpace(couponInput))
+            {
+                throw new Exception("Coupon code is not valid");
+            }
+
+            var coupon = await Mediator.Send(new GetCouponQuery(user!.Id, couponInput));
+
+            if (coupon == null)
+            {
+                throw new Exception("Unkown error when claim");
+            }
+
+            var result = await Mediator.Send(new RedeemCouponCommand(1, coupon.Code, coupon.Amount));
+
+            if (result)
+            {
+                canClaim = false;
+                Snackbar.Add("Claim successfully", Severity.Success);
+            }
+            else
+            {
+                throw new Exception("Claim failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
     }
 }
