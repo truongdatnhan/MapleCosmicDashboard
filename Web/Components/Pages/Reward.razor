@@ -66,6 +66,12 @@
     private Account? user;
     private string? couponInput;
     private bool canClaim;
+    private int claimAmount => user?.Streak switch
+    {
+        >= 30 => 1000,
+        >= 14 => 700,
+        _ => 500
+    };
 
     private Color FirstGoalLine => user != null && user.Streak >= 1 ? Color.Success : Color.Default;
     private Severity FirstGoalText => FirstGoalLine == Color.Success ? Severity.Success : Severity.Info;
@@ -134,7 +140,7 @@
                 throw new Exception("Unkown error when claim");
             }
 
-            var result = await Mediator.Send(new RedeemCouponCommand(1, coupon.Code, coupon.Amount));
+            var result = await Mediator.Send(new RedeemCouponCommand(1, coupon.Code, coupon.Amount, false));
 
             if (result)
             {

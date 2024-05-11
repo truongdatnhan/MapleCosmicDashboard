@@ -25,6 +25,15 @@ namespace Application.Common
             return new string(randomChars);
         }
 
+        public static string HashPasswordWithSHA512(string password)
+        {
+            using (SHA512 sha512 = SHA512.Create())
+            {
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                byte[] hashedBytes = sha512.ComputeHash(passwordBytes);
+                return BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
+            }
+        }
 
     }
 

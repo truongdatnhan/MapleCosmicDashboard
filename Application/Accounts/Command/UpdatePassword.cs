@@ -9,14 +9,27 @@ using System.Threading.Tasks;
 
 namespace Application.Accounts.Command
 {
-    public record UpdatePasswordCommand(int Id, string Password) : IRequest<int>;
+    public record UpdatePasswordCommand(int Id, string OldPassword, string NewPassword) : IRequest<bool>;
 
-    public class UpdatePasswordHandler(ISqlDataAccess sqlDataAccess) : IRequestHandler<UpdatePasswordCommand, int>
+    public class UpdatePasswordHandler(ISqlDataAccess sqlDataAccess) : IRequestHandler<UpdatePasswordCommand, bool>
     {
-        public async Task<int> Handle(UpdatePasswordCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdatePasswordCommand request, CancellationToken cancellationToken)
         {
-            var query = @"UPDATE accounts SET password = @password WHERE id = @id";
-            return await sqlDataAccess.ExecuteAsync(query, new { password = request.Password, id = request.Id });
+
+            var currentPass = await sqlDataAccess.QueryFirstOrDefaultAsync<string>("SELECT password FROM Accounts WHERE id = @id",
+                new { id = request.Id });
+
+            bool passMatch = BCrypt.Net.BCrypt.Verify(request.OldPassword, currentPass);
+
+            if(!passMatch)
+            {
+                return false;
+            }
+
+            var newPassHashed = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, workFactor: 12);
+
+            var query = @"UPDATE accounts SET password = @newPass WHERE id = @id";
+            return await sqlDataAccess.ExecuteAsync(query, new { newPass = newPassHashed, id = request.Id }) == 1;
         }
     }
 }

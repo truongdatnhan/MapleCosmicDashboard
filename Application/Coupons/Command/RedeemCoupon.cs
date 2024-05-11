@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Coupons.Command
 {
-    public record RedeemCouponCommand(int UserId, string Coupon, int Amount) : IRequest<bool>;
+    public record RedeemCouponCommand(int UserId, string Coupon, int Amount, bool IsDaily = true) : IRequest<bool>;
 
     public class RedeemCouponHandler(ISqlDataAccess sqlDataAccess) : IRequestHandler<RedeemCouponCommand, bool>
     {
@@ -29,8 +29,15 @@ namespace Application.Coupons.Command
                         throw new Exception("Unknown coupon code");
                     }
 
-                    var updateNxQuery = @"UPDATE accounts SET nxCredit = nxCredit + @amount, lastRedeem = NOW(), streak = streak + 1 WHERE id = @accountId ";
-                    var updateNxResult = await sqlDataAccess.ExecuteAsync(updateNxQuery, new { amount = request.Amount, accountId = request.UserId }, transaction: transaction);
+                    int streakDay = 0;
+
+                    if(request.IsDaily)
+                    {
+                        streakDay = 1;
+                    }
+
+                    var updateNxQuery = @"UPDATE accounts SET nxCredit = nxCredit + @amount, lastRedeem = NOW(), streak = streak + @streak WHERE id = @accountId ";
+                    var updateNxResult = await sqlDataAccess.ExecuteAsync(updateNxQuery, new { amount = request.Amount, streak = streakDay, accountId = request.UserId }, transaction: transaction);
 
                     if (updateNxResult == 0)
                     {
