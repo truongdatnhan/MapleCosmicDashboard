@@ -21,6 +21,12 @@
     </MudStack>
     <EditForm Model="@Model" OnValidSubmit="OnValidSubmit" FormName="RegisterForm">
         <DataAnnotationsValidator />
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudCardHeader>
+                <MudAlert Class="flex-1" Severity="Severity.Error" Variant="Variant.Filled">@ErrorMessage</MudAlert>
+                </MudCardHeader>
+        }
         <MudCardContent>
             <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)" name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
              <MudTextField T="string" Label="Email" @bind-Value="Model.Email" For="@(() => Model.Email)" name="Model.Email" InputType="InputType.Email" Variant="Variant.Outlined" Placeholder="Enter your email" ShrinkLabel />
@@ -38,6 +44,8 @@
     [SupplyParameterFromForm]
     RegisterVM Model { get; set; } = default!;
 
+    private string? ErrorMessage { get; set; }
+
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
@@ -45,7 +53,14 @@
 
     private async Task OnValidSubmit(EditContext context)
     {
-        await Mediator.Send(new InsertAccountCommand(Model.Username, Model.Email, Model.Password));
+        var result = await Mediator.Send(new InsertAccountCommand(Model.Username, Model.Password, Model.Email));
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.ErrorMessage;
+            return;
+        }
+        
         NavigationManager.NavigateTo("/account/login", true, true);
     }
 
