@@ -1,7 +1,7 @@
 <h1 align="center">MapleCosmicDashboard</h1>
 
-> This is a fun, small dashboard for MapleStory Server. It's built on C# Fullstack Blazor, which is a framework I love.
-> I want people to know more about Cosmic and Blazor.
+> This is a fun, small dashboard for MapleStory Server. It's built on C# Fullstack Blazor, which is a framework I love. <br>
+> I want people to know more about Cosmic and Blazor.<br>
 > Since this is a hobby project, don't expect much.
 
 ## 🚀 Usage
