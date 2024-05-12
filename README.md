@@ -4,6 +4,9 @@
 > I want people to know more about Cosmic and Blazor.<br>
 > Since this is a hobby project, don't expect much.
 
+## Prerequisites
+.NET 8 + Visual Studio 2022
+
 ## 🚀 Usage
 Run this SQL for the dashboard to work.
 ```sh
