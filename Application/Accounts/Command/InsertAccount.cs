@@ -15,8 +15,9 @@ namespace Application.Accounts.Command
     {
         public async Task<int> Handle(InsertAccountCommand request, CancellationToken cancellationToken)
         {
+            var passHashed = BCrypt.Net.BCrypt.HashPassword(request.Password, workFactor: 12);
             return await sqlDataAccess.ExecuteAsync("INSERT INTO accounts (name, password, email) VALUES (@username, @password, @email) ",
-                new { username = request.Username, password = request.Password, email = request.Email });
+                new { username = request.Username, password = passHashed, email = request.Email });
         }
     }
 }

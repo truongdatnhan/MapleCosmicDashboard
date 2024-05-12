@@ -1,7 +1,10 @@
 ﻿@inject ISnackbar Snackbar
 
 <MudPopoverProvider></MudPopoverProvider>
-<MudDialogProvider />
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.Medium"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
 <MudSnackbarProvider />
 
 @code {

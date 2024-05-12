@@ -1,4 +1,16 @@
 ﻿@page "/profile"
+@using Application.Accounts.Command
+@using Application.Accounts.Query
+@using Domain.Entities
+@using System.Security.Claims
+@using Web.Components.Dialog.Profile
+@using Web.Models.Profile
+@attribute [Authorize]
+@inject IMediator Mediator
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProfileVMValidator Validator
+@inject IDialogService DialogService
 
 
 <PageTitle>Profile</PageTitle>
@@ -6,25 +18,28 @@
 <MudPaper Class="d-flex flex-row" Elevation="2" Height="100%">
     <MudStack Row="true" Class="flex-auto flex-wrap pa-4" AlignItems="AlignItems.Center">
         <MudText Class="pa-4" Style="flex: 0 1 100%" Typo="Typo.h5">Information</MudText>
-        <MudForm Class="flex-1">
+        <MudForm Class="flex-1" @ref="form" Model="@model" Validation="@(Validator.ValidateValue)" ValidationDelay="0">
             <MudStack Row="true" AlignItems="AlignItems.Center">
                 <MudAvatar Style="background-color:unset; height:150px; width:150px">
                     <MudImage Src="images/avatar.png" Alt="Avatar" />
                 </MudAvatar>
                 <MudStack Class="flex-1" Justify="Justify.Center" Spacing="0">
-                    <MudTextField T="string" Label="Username" Variant="Variant.Outlined" />
-                    <MudTextField T="string" Label="Email" Variant="Variant.Outlined" />
+                    <MudTextField T="string" @bind-Value="model.Username" Label="Username"
+                                  Variant="Variant.Outlined" Disabled="true" For="(() => model.Username)" />
+                    <MudTextField T="string" @bind-Value="model.Email" Label="Email"
+                                  Variant="Variant.Outlined" For="(() => model.Email)" />
                 </MudStack>
             </MudStack>
             <MudStack Row="true" Spacing="4">
-                <MudDatePicker Label="Birthday" @bind-Date="date2" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="Enter your date of birth" Variant="Variant.Outlined" Editable="true" />
-                <MudSelect T="string" Label="Gender" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined">
-                    <MudSelectItem Value="@("male")">Male</MudSelectItem>
-                    <MudSelectItem Value="@("female")">Female</MudSelectItem>
+                <MudDatePicker Label="Birthday" @bind-Date="model.Birthday" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy"
+                               Placeholder="Enter your date of birth" Variant="Variant.Outlined" Editable="true" For="(() => model.Birthday)" />
+                <MudSelect T="int" Label="Gender" @bind-Value="model.Gender" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" For="(() => model.Gender)">
+                    <MudSelectItem Value="@(0)">Male</MudSelectItem>
+                    <MudSelectItem Value="@(1)">Female</MudSelectItem>
                 </MudSelect>
             </MudStack>
             <div class="d-flex align-center justify-space-between">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="flex-1 mt-4">Save</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="flex-1 mt-4" OnClick="Submit">Save</MudButton>
             </div>
         </MudForm>
     </MudStack>
@@ -33,7 +48,7 @@
         <MudText Class="pa-4" Typo="Typo.h5">Security</MudText>
         <MudStack Row="true" Justify="Justify.SpaceBetween">
             <MudText Typo="Typo.subtitle1">Change password</MudText>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ChangePassword">Update</MudButton>
         </MudStack>
         <MudStack Row="true" Justify="Justify.SpaceBetween">
             <MudText Typo="Typo.subtitle1">Change PIC</MudText>
@@ -43,11 +58,57 @@
 </MudPaper>
 
 @code {
-    private int currentCount = 0;
-    DateTime? date2 = DateTime.Today;
+    private ProfileVM model = new();
+    MudForm form = default!;
+    private Account? user;
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdentity = authState.User;
+        var userId = userIdentity.FindFirstValue(ClaimTypes.Sid);
+        model.Id = int.Parse(userId!);
+        user = await Mediator.Send(new GetAccountQuery(model.Id));
+        if (user == null)
+        {
+            Snackbar.Add("Unknown error, reload page", Severity.Error);
+            return;
+        }
+
+        model.Username = user.Name;
+        model.Email = user.Email;
+        model.Gender = user.Gender;
+        model.Birthday = user.Birthday;
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            try
+            {
+                var success = await Mediator.Send(new UpdateProfileCommand(model.Id, model.Email!, model.Birthday!.Value, model.Gender));
+                if (success)
+                {
+                    Snackbar.Add("Update profile success", Severity.Success);
+                }
+                else
+                {
+                    throw new Exception("Update profile failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task ChangePassword()
+    {
+        var parameters = new DialogParameters { ["AccountId"] = user.Id };
+        DialogService.Show<ChangePasswordDialog>("Change password", parameters);
     }
 }

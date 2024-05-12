@@ -1,11 +1,13 @@
 ﻿@page "/account/register"
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
+@using Application.Accounts.Command
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Web.Components.Layout
 @layout AuthLayout
 @inject NavigationManager NavigationManager
+@inject IMediator Mediator
 
 <PageTitle>Register</PageTitle>
 
@@ -43,34 +45,27 @@
 
     private async Task OnValidSubmit(EditContext context)
     {
-        var identity = new ClaimsIdentity(new[]
-            {
-            new Claim(ClaimTypes.Sid, "1"),
-            new Claim(ClaimTypes.Name, "test"),
-            new Claim(ClaimTypes.Role, 1 == 1 ? "Admin" : "User")
-            }, CookieAuthenticationDefaults.AuthenticationScheme);
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
-        NavigationManager.NavigateTo("/", true, true);
+        await Mediator.Send(new InsertAccountCommand(Model.Username, Model.Email, Model.Password));
+        NavigationManager.NavigateTo("/account/login", true, true);
     }
 
     public class RegisterVM
     {
         [Required]
         [StringLength(13, ErrorMessage = "Username length can't be more than 13.")]
-        public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string? Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
-        public string? Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         [Required]
         [Compare(nameof(Password))]
-        public string? Password2 { get; set; }
+        public string Password2 { get; set; } = string.Empty;
     }
 
 }

@@ -16,21 +16,17 @@ namespace Application.Accounts.Query
     {
         public async Task<Account?> Handle(GetAccountLoginQuery request, CancellationToken cancellationToken)
         {
-            var bCryptHashed = BCrypt.Net.BCrypt.HashPassword(request.Password, workFactor: 12);
-            var shaHashed = HashPasswordWithSHA512(request.Password);
+            var user = await sqlDataAccess.QueryFirstOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE Name = @username",
+                new { username = request.Username });
 
-            return await sqlDataAccess.QueryFirstOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE Name = @username AND (Password = @normalPassword OR Password = @bcryptPassword OR Password = @shaPassword)",
-                new { username = request.Username, normalPassword = request.Password, bcryptPassword = bCryptHashed, shaPassword = shaHashed });
-        }
-
-        public static string HashPasswordWithSHA512(string password)
-        {
-            using (SHA512 sha512 = SHA512.Create())
+            if(user == null)
             {
-                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-                byte[] hashedBytes = sha512.ComputeHash(passwordBytes);
-                return BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
+                return null;
             }
+
+            bool passMatch = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+
+            return passMatch ? user : null;
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿@page "/account/login"
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
+@using Application.Accounts.Query
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Web.Components.Layout
 @layout AuthLayout
 @inject NavigationManager NavigationManager
+@inject IMediator Mediator
 
 <PageTitle>Login</PageTitle>
 
@@ -19,22 +21,31 @@
     </MudStack>
     <EditForm Model="@Model" OnValidSubmit="OnValidSubmit" FormName="LoginForm">
         <DataAnnotationsValidator />
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudCardHeader>
+                <MudAlert Class="flex-1" Severity="Severity.Error" Variant="Variant.Filled">@ErrorMessage</MudAlert>
+                </MudCardHeader>
+        }
+
         <MudCardContent>
-            <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)" 
-                name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
+            <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)"
+                          name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
              <MudTextField T="string" Label="Password" InputType="InputType.Password" @bind-Value="Model.Password"
                            For="@(() => Model.Password)" name="Model.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Login</MudButton>
-        </MudCardActions>
-    </EditForm>
-</MudPaper>
+         </MudCardContent>
+         <MudCardActions>
+             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Login</MudButton>
+         </MudCardActions>
+     </EditForm>
+ </MudPaper>
 
 
  @code {
     [SupplyParameterFromForm]
-    LoginVM Model { get; set; } = default!;
+    private LoginVM Model { get; set; } = default!;
+
+    private string? ErrorMessage { get; set; }
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -43,11 +54,20 @@
 
     private async Task OnValidSubmit(EditContext context)
     {
+
+        var user = await Mediator.Send(new GetAccountLoginQuery(Model.Username, Model.Password));
+
+        if (user == null)
+        {
+            ErrorMessage = "Incorrect login info";
+            return;
+        }
+
         var identity = new ClaimsIdentity(new[]
             {
-            new Claim(ClaimTypes.Sid, "1"),
-            new Claim(ClaimTypes.Name, "test"),
-            new Claim(ClaimTypes.Role, 1 == 1 ? "Admin" : "User")
+            new Claim(ClaimTypes.Sid, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Role, user.WebAdmin == 1 ? "Admin" : "User")
             }, CookieAuthenticationDefaults.AuthenticationScheme);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
@@ -58,11 +78,11 @@
     {
         [Required]
         [StringLength(13, ErrorMessage = "Username length can't be more than 13.")]
-        public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [Required]
         [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
-        public string? Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 
 }
