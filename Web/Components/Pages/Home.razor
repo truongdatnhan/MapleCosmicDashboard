@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Application.Dashboard.Query
+@inject IMediator Mediator
 
 <PageTitle>Home</PageTitle>
 
@@ -26,7 +28,7 @@
             <MudIcon Icon="@Icons.Material.Filled.Public" Color="MudBlazor.Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Player Online</MudText>
-                <MudText Typo="Typo.h5">100</MudText>
+                <MudText Typo="Typo.h5">@player</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -97,15 +99,18 @@
     @code {
     private Transition transition = Transition.Slide;
     private List<CharacterData> characters = default!;
+    private int player;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        player = await Mediator.Send(new CountPlayerOnlineQuery());
         characters = new();
         characters.Add(new(1, "Example 1", 200, "Knight", 100000));
         characters.Add(new(2, "Example 2", 200, "Knight", 100000));
         characters.Add(new(3, "Example 3", 200, "Knight", 100000));
         characters.Add(new(4, "Example 4", 200, "Knight", 100000));
     }
+
 
 
     record CharacterData(int Rank, string Name, int Level, string Job, int Amount);
