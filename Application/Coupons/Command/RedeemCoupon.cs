@@ -12,6 +12,7 @@ namespace Application.Coupons.Command
 {
     public record RedeemCouponCommand(int UserId, string Coupon, int Amount, bool IsDaily = true) : IRequest<bool>;
 
+
     public class RedeemCouponHandler(ISqlDataAccess sqlDataAccess) : IRequestHandler<RedeemCouponCommand, bool>
     {
         public async Task<bool> Handle(RedeemCouponCommand request, CancellationToken cancellationToken)

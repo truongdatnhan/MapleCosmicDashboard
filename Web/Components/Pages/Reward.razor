@@ -73,6 +73,7 @@
         _ => 500
     };
 
+
     private Color FirstGoalLine => user != null && user.Streak >= 1 ? Color.Success : Color.Default;
     private Severity FirstGoalText => FirstGoalLine == Color.Success ? Severity.Success : Severity.Info;
     private Color SecondGoalLine => user != null && user.Streak >= 14 ? Color.Success : Color.Default;
@@ -94,6 +95,7 @@
 
         canClaim = user.LastRedeem.HasValue ? DateTime.Now.Date != user.LastRedeem.Value.Date : true;
     }
+
 
     private async Task Claim()
     {

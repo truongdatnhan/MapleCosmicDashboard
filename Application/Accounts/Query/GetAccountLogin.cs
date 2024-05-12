@@ -28,6 +28,5 @@ namespace Application.Accounts.Query
 
             return passMatch ? user : null;
         }
-
     }
 }
