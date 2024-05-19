@@ -1,17 +1,18 @@
 ﻿@page "/profile"
+@attribute [Authorize]
 @using Application.Accounts.Command
 @using Application.Accounts.Query
 @using Domain.Entities
 @using System.Security.Claims
 @using Web.Components.Dialog.Profile
 @using Web.Models.Profile
-@attribute [Authorize]
+@using Web.Services
 @inject IMediator Mediator
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ProfileVMValidator Validator
 @inject IDialogService DialogService
-
+@inject AccountService AccountService
 
 <PageTitle>Profile</PageTitle>
 
@@ -62,16 +63,12 @@
     MudForm form = default!;
     private Account? user;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userIdentity = authState.User;
-        var userId = userIdentity.FindFirstValue(ClaimTypes.Sid);
-        model.Id = int.Parse(userId!);
-        user = await Mediator.Send(new GetAccountQuery(model.Id));
+        user = AccountService.Account;
         if (user == null)
         {
-            Snackbar.Add("Unknown error, reload page", Severity.Error);
+            Snackbar.Add("Account not found, try login again.", Severity.Error);
             return;
         }
 
@@ -93,6 +90,7 @@
                 if (success)
                 {
                     Snackbar.Add("Update profile success", Severity.Success);
+                    await AccountService.FetchAccountAsync();
                 }
                 else
                 {
@@ -106,8 +104,13 @@
         }
     }
 
-    private async Task ChangePassword()
+    private void ChangePassword()
     {
+        if (user == null)
+        {
+            Snackbar.Add("Account not found, try login again.", Severity.Error);
+            return;
+        }
         var parameters = new DialogParameters { ["AccountId"] = user.Id };
         DialogService.Show<ChangePasswordDialog>("Change password", parameters);
     }

@@ -1,13 +1,15 @@
 ﻿@page "/reward"
+@attribute [Authorize]
 @using Application.Accounts.Query
 @using Application.Coupons.Command
 @using Application.Coupons.Query
 @using Domain.Entities
 @using MediatR
-@attribute [Authorize]
+@using Web.Services
 @inject IMediator Mediator
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountService
 
 <PageTitle>Reward</PageTitle>
 
@@ -81,15 +83,12 @@
     private Color ThirdGoalLine => user != null && user.Streak >= 30 ? Color.Success : Color.Default;
     private Severity ThirdGoalText => ThirdGoalLine == Color.Success ? Severity.Success : Severity.Info;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userIdentity = authState.User;
-
-        user = await Mediator.Send(new GetAccountQuery(1));
+        user = AccountService.Account;
         if (user == null)
         {
-            Snackbar.Add("Unknown error, reload page", Severity.Error);
+            Snackbar.Add("Account not found, try login again.", Severity.Error);
             return;
         }
 
@@ -130,7 +129,7 @@
     {
         try
         {
-            if(string.IsNullOrWhiteSpace(couponInput))
+            if (string.IsNullOrWhiteSpace(couponInput))
             {
                 throw new Exception("Coupon code is not valid");
             }

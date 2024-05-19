@@ -62,41 +62,41 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Rank">@context.Rank</MudTd>
-                        <MudTd DataLabel="Name">@context.Name</MudTd>
-                        <MudTd DataLabel="Level">@context.Level</MudTd>
-                        <MudTd DataLabel="Job">@context.Job</MudTd>
-                        <MudTd DataLabel="NX">@context.Amount.ToString("#,0.##")</MudTd>
-                    </RowTemplate>
-                </MudTable>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Level">@context.Level</MudTd>
+                    <MudTd DataLabel="Job">@context.Job</MudTd>
+                    <MudTd DataLabel="NX">@context.Amount.ToString("#,0.##")</MudTd>
+                </RowTemplate>
+            </MudTable>
 
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudPaper Elevation="4" Height="100%">
-                <MudTable Items="@characters" Hover="true">
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">TOP RIZZ</MudText>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Rank</MudTh>
-                        <MudTh>Name</MudTh>
-                        <MudTh>Level</MudTh>
-                        <MudTh>Job</MudTh>
-                        <MudTh>Fame</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Rank">@context.Rank</MudTd>
-                        <MudTd DataLabel="Name">@context.Name</MudTd>
-                        <MudTd DataLabel="Level">@context.Level</MudTd>
-                        <MudTd DataLabel="Job">@context.Job</MudTd>
-                        <MudTd DataLabel="Fame">@context.Amount.ToString("#,0.##")</MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudPaper Elevation="4" Height="100%">
+            <MudTable Items="@characters" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">TOP RIZZ</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Rank</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Level</MudTh>
+                    <MudTh>Job</MudTh>
+                    <MudTh>Fame</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Rank">@context.Rank</MudTd>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Level">@context.Level</MudTd>
+                    <MudTd DataLabel="Job">@context.Job</MudTd>
+                    <MudTd DataLabel="Fame">@context.Amount.ToString("#,0.##")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-    @code {
+@code {
     private Transition transition = Transition.Slide;
     private List<CharacterData> characters = default!;
     private int player;
@@ -110,8 +110,6 @@
         characters.Add(new(3, "Example 3", 200, "Knight", 100000));
         characters.Add(new(4, "Example 4", 200, "Knight", 100000));
     }
-
-
 
     record CharacterData(int Rank, string Name, int Level, string Job, int Amount);
 }

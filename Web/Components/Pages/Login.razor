@@ -25,23 +25,23 @@
         {
             <MudCardHeader>
                 <MudAlert Class="flex-1" Severity="Severity.Error" Variant="Variant.Filled">@ErrorMessage</MudAlert>
-                </MudCardHeader>
+            </MudCardHeader>
         }
 
         <MudCardContent>
             <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)"
                           name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
-             <MudTextField T="string" Label="Password" InputType="InputType.Password" @bind-Value="Model.Password"
-                           For="@(() => Model.Password)" name="Model.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
-         </MudCardContent>
-         <MudCardActions>
-             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Login</MudButton>
-         </MudCardActions>
-     </EditForm>
- </MudPaper>
+            <MudTextField T="string" Label="Password" InputType="InputType.Password" @bind-Value="Model.Password"
+                          For="@(() => Model.Password)" name="Model.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Login</MudButton>
+        </MudCardActions>
+    </EditForm>
+</MudPaper>
 
 
- @code {
+@code {
     [SupplyParameterFromForm]
     private LoginVM Model { get; set; } = default!;
 
