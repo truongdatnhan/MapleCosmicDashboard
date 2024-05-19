@@ -1,17 +1,21 @@
 ﻿@inherits LayoutComponentBase
+@using System.Security.Claims
 @using Web.Components
+@using Web.Services
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AccountService AccountService
 
 <MyMudThemeProvider />
 <MyMudProviders />
 
 <MudLayout>
     <MudAppBar Elevation="0">
-		<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/truongdatnhan/MapleCosmicDashboard" Target="_blank" />
         <MudIconButton Icon="@Icons.Custom.Brands.Discord" Color="Color.Inherit" Href="https://discord.gg/JU5aQapVZK" Target="_blank" />
-        
         <AuthorizeView>
             <Authorized>
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter">
@@ -24,7 +28,6 @@
                 <MudButton OnClick="@(() => NavigateTo("/account/register"))" Color="Color.Inherit">Register</MudButton>
             </NotAuthorized>
         </AuthorizeView>
-        
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>
@@ -41,6 +44,26 @@
 
 @code {
     bool _drawerOpen = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdentity = authState.User;
+
+        if (userIdentity?.Identity == null || !userIdentity.Identity.IsAuthenticated)
+        {
+            return;
+        }
+
+        var id = userIdentity.FindFirstValue(ClaimTypes.Sid);
+        if (id == null)
+        {
+            return;
+        }
+
+        var userId = int.Parse(id);
+        await AccountService.FetchAccountAsync(userId);
+    }
 
     void DrawerToggle()
     {

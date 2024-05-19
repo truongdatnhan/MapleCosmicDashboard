@@ -25,22 +25,22 @@
         {
             <MudCardHeader>
                 <MudAlert Class="flex-1" Severity="Severity.Error" Variant="Variant.Filled">@ErrorMessage</MudAlert>
-                </MudCardHeader>
+            </MudCardHeader>
         }
         <MudCardContent>
             <MudTextField T="string" Label="Username" @bind-Value="Model.Username" For="@(() => Model.Username)" name="Model.Username" Variant="Variant.Outlined" Placeholder="Enter your username" ShrinkLabel />
-             <MudTextField T="string" Label="Email" @bind-Value="Model.Email" For="@(() => Model.Email)" name="Model.Email" InputType="InputType.Email" Variant="Variant.Outlined" Placeholder="Enter your email" ShrinkLabel />
-             <MudTextField T="string" Label="Password" @bind-Value="Model.Password" For="@(() => Model.Password)" name="Model.Password" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
-             <MudTextField T="string" Label="Password" @bind-Value="Model.Password2" For="@(() => Model.Password2)" name="Model.Password2" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Repeat your username" ShrinkLabel />
-         </MudCardContent>
-         <MudCardActions>
-             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Register</MudButton>
-         </MudCardActions>
-     </EditForm>
- </MudPaper>
+            <MudTextField T="string" Label="Email" @bind-Value="Model.Email" For="@(() => Model.Email)" name="Model.Email" InputType="InputType.Email" Variant="Variant.Outlined" Placeholder="Enter your email" ShrinkLabel />
+            <MudTextField T="string" Label="Password" @bind-Value="Model.Password" For="@(() => Model.Password)" name="Model.Password" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Enter your password" ShrinkLabel />
+            <MudTextField T="string" Label="Password" @bind-Value="Model.Password2" For="@(() => Model.Password2)" name="Model.Password2" InputType="InputType.Password" Variant="Variant.Outlined" Placeholder="Repeat your username" ShrinkLabel />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="flex-1">Register</MudButton>
+        </MudCardActions>
+    </EditForm>
+</MudPaper>
 
 
- @code {
+@code {
     [SupplyParameterFromForm]
     RegisterVM Model { get; set; } = default!;
 
@@ -60,7 +60,7 @@
             ErrorMessage = result.ErrorMessage;
             return;
         }
-        
+
         NavigationManager.NavigateTo("/account/login", true, true);
     }
 
