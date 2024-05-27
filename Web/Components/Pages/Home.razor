@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Application.Characters.DTOs
 @using Application.Dashboard.Query
 @inject IMediator Mediator
 
@@ -49,36 +50,40 @@
     </MudHidden>
     <MudItem xs="12" sm="6">
         <MudPaper Elevation="4" Height="100%">
-            <MudTable Items="@characters" Hover="true">
+            <MudTable Items="@topRichest" Hover="true">
                 <ToolBarContent>
-                    <MudText Typo="Typo.h6">TOP NX</MudText>
+                    <MudText Typo="Typo.h6">TOP RICHEST</MudText>
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Rank</MudTh>
+                    <MudTh></MudTh>
                     <MudTh>Name</MudTh>
                     <MudTh>Level</MudTh>
                     <MudTh>Job</MudTh>
-                    <MudTh>NX</MudTh>
+                    <MudTh>Meso</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Rank">@context.Rank</MudTd>
+                    <MudTd DataLabel="Image">
+                        <MudImage Src="@context.CharacterAvatar()" Alt="Avatar Character" />
+                    </MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Level">@context.Level</MudTd>
                     <MudTd DataLabel="Job">@context.Job</MudTd>
-                    <MudTd DataLabel="NX">@context.Amount.ToString("#,0.##")</MudTd>
+                    <MudTd DataLabel="NX">@context.MesoFormatted()</MudTd>
                 </RowTemplate>
             </MudTable>
-
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudPaper Elevation="4" Height="100%">
-            <MudTable Items="@characters" Hover="true">
+            <MudTable Items="@topFame" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">TOP RIZZ</MudText>
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Rank</MudTh>
+                    <MudTh></MudTh>
                     <MudTh>Name</MudTh>
                     <MudTh>Level</MudTh>
                     <MudTh>Job</MudTh>
@@ -86,10 +91,13 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Rank">@context.Rank</MudTd>
+                    <MudTd DataLabel="Image">
+                        <MudImage Src="@context.CharacterAvatar()" Alt="Avatar Character" />
+                    </MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Level">@context.Level</MudTd>
                     <MudTd DataLabel="Job">@context.Job</MudTd>
-                    <MudTd DataLabel="Fame">@context.Amount.ToString("#,0.##")</MudTd>
+                    <MudTd DataLabel="Fame">@context.Fame.ToString("#,0.##")</MudTd>
                 </RowTemplate>
             </MudTable>
         </MudPaper>
@@ -98,18 +106,16 @@
 
 @code {
     private Transition transition = Transition.Slide;
-    private List<CharacterData> characters = default!;
+    private List<CharDto> topFame = new();
+    private List<CharDto> topRichest = new();
     private int player;
 
     protected override async Task OnInitializedAsync()
     {
         player = await Mediator.Send(new CountPlayerOnlineQuery());
-        characters = new();
-        characters.Add(new(1, "Example 1", 200, "Knight", 100000));
-        characters.Add(new(2, "Example 2", 200, "Knight", 100000));
-        characters.Add(new(3, "Example 3", 200, "Knight", 100000));
-        characters.Add(new(4, "Example 4", 200, "Knight", 100000));
+
+        topFame = await Mediator.Send(new GetTopFamePlayerQuery());
+        topRichest = await Mediator.Send(new GetTopMesoPlayerQuery());
     }
 
-    record CharacterData(int Rank, string Name, int Level, string Job, int Amount);
 }
