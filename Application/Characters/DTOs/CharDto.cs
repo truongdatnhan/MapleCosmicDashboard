@@ -23,6 +23,7 @@ namespace Application.Characters.DTOs
         public HashSet<CharItemDto> ItemsEquipped { get; set; } = new();
         public string CharacterAvatar()
         {
+            //add default if character not wearing anything
             if (ItemsEquipped.Count == 0)
             {
                 if (IsFemale)
@@ -41,7 +42,6 @@ namespace Application.Characters.DTOs
             ItemsEquipped.Add(new(2000 + SkinColor));
             ItemsEquipped.Add(new(12000 + SkinColor));
 
-            //add hair, face
             ItemsEquipped.Add(new(Hair));
             ItemsEquipped.Add(new(Face));
 
@@ -62,7 +62,7 @@ namespace Application.Characters.DTOs
             {
                 meso = Meso / 1000000;
                 letter = 'M';
-            } else
+            } else // 1b
             {
                 meso = Meso / 1000000000;
                 letter = 'B';
