@@ -59,7 +59,8 @@ namespace Application.Dashboard.Query
                         tc.hair,
                         tc.face,
                         tc.total_meso AS meso,
-                        inv.itemid
+                        inv.itemid,
+                        inv.position
                     FROM
                         top_characters tc
                     LEFT JOIN `inventoryitems` inv ON

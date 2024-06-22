@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Application.Characters.DTOs
@@ -24,17 +25,27 @@ namespace Application.Characters.DTOs
         public string CharacterAvatar()
         {
             //add default if character not wearing anything
-            if (ItemsEquipped.Count == 0)
+            if (!ItemsEquipped.Any(x => x.Position == -5)) // top
             {
                 if (IsFemale)
                 {
-                    ItemsEquipped.Add(new(1041046));
-                    ItemsEquipped.Add(new(1061039));
+                    ItemsEquipped.Add(new(1041046)); // top
                 }
                 else
                 {
-                    ItemsEquipped.Add(new(1042162));
-                    ItemsEquipped.Add(new(1062112));
+                    ItemsEquipped.Add(new(1042162)); // top
+                }
+            }
+
+            if (!ItemsEquipped.Any(x => x.Position == -6)) // bottom
+            {
+                if (IsFemale)
+                {
+                    ItemsEquipped.Add(new(1061039)); // bottom
+                }
+                else
+                {
+                    ItemsEquipped.Add(new(1062112)); // bottom
                 }
             }
 
@@ -46,7 +57,7 @@ namespace Application.Characters.DTOs
             ItemsEquipped.Add(new(Face));
 
             string json = JsonSerializer.Serialize(ItemsEquipped, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-            string imageUrl = $"https://maplestory.io/api/character/{json.Substring(1,json.Length-2)}/jump";
+            string imageUrl = $"https://maplestory.io/api/character/{json.Substring(1, json.Length - 2)}/jump";
             return imageUrl;
         }
 
@@ -54,15 +65,17 @@ namespace Application.Characters.DTOs
         {
             char? letter;
             decimal meso = 0;
-            if(Meso < 1000000) //1m
+            if (Meso < 1000000) //1m
             {
                 meso = Meso / 1000;
                 letter = 'K';
-            } else if(Meso < 100000000) //100m
+            }
+            else if (Meso < 100000000) //100m
             {
                 meso = Meso / 1000000;
                 letter = 'M';
-            } else // 1b
+            }
+            else // 1b
             {
                 meso = Meso / 1000000000;
                 letter = 'B';
@@ -74,6 +87,8 @@ namespace Application.Characters.DTOs
     public class CharItemDto
     {
         public int ItemId { get; set; }
+        [JsonIgnore]
+        public int Position { get; set; }
         public string Region { set; get; } = "GMS";
         public string Version { set; get; } = "83";
 
@@ -81,6 +96,14 @@ namespace Application.Characters.DTOs
         {
             ItemId = itemId;
         }
+
+        public CharItemDto(int itemId, int position)
+        {
+            ItemId = itemId;
+            Position = position;
+        }
+
+
     }
 
 }
