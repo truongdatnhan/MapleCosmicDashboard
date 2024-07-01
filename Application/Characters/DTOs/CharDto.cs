@@ -24,28 +24,33 @@ namespace Application.Characters.DTOs
         public HashSet<CharItemDto> ItemsEquipped { get; set; } = new();
         public string CharacterAvatar()
         {
-            //add default if character not wearing anything
-            if (!ItemsEquipped.Any(x => x.Position == -5)) // top
-            {
-                if (IsFemale)
-                {
-                    ItemsEquipped.Add(new(1041046)); // top
-                }
-                else
-                {
-                    ItemsEquipped.Add(new(1042162)); // top
-                }
-            }
+            var hasOverall = ItemsEquipped.Any(x => x.IsOverall);
 
-            if (!ItemsEquipped.Any(x => x.Position == -6)) // bottom
+            if (!hasOverall)
             {
-                if (IsFemale)
+                //add default if character not wearing anything
+                if (!ItemsEquipped.Any(x => x.Position == -5)) // top
                 {
-                    ItemsEquipped.Add(new(1061039)); // bottom
+                    if (IsFemale)
+                    {
+                        ItemsEquipped.Add(new(1041046)); // top
+                    }
+                    else
+                    {
+                        ItemsEquipped.Add(new(1042162)); // top
+                    }
                 }
-                else
+
+                if (!ItemsEquipped.Any(x => x.Position == -6)) // bottom
                 {
-                    ItemsEquipped.Add(new(1062112)); // bottom
+                    if (IsFemale)
+                    {
+                        ItemsEquipped.Add(new(1061039)); // bottom
+                    }
+                    else
+                    {
+                        ItemsEquipped.Add(new(1062112)); // bottom
+                    }
                 }
             }
 
@@ -91,6 +96,8 @@ namespace Application.Characters.DTOs
         public int Position { get; set; }
         public string Region { set; get; } = "GMS";
         public string Version { set; get; } = "83";
+        [JsonIgnore]
+        public bool IsOverall => ItemId / 10000 == 105;
 
         public CharItemDto(int itemId)
         {
