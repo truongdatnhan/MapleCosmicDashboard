@@ -47,7 +47,8 @@ namespace Application.Dashboard.Query
                             rc.hair,
                             rc.face,
                             rc.fame,
-                            inv.itemid
+                            inv.itemid,
+                            inv.position
                         FROM
                             ranked_characters rc
                         LEFT JOIN `inventoryitems` inv ON
