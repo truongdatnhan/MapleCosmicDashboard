@@ -62,14 +62,14 @@ namespace Application.Characters.DTOs
             ItemsEquipped.Add(new(Face));
 
             string json = JsonSerializer.Serialize(ItemsEquipped, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-            string imageUrl = $"https://maplestory.io/api/character/{json.Substring(1, json.Length - 2)}/jump";
+            string imageUrl = $"https://maplestory.io/api/character/{json.AsSpan(1, json.Length - 2)}/jump";
             return imageUrl;
         }
 
         public string MesoFormatted()
         {
             char? letter;
-            decimal meso = 0;
+            decimal meso;
             if (Meso < 1000000) //1m
             {
                 meso = Meso / 1000;
