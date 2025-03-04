@@ -1,0 +1,48 @@
+services:
+  web:
+    image: ${DOCKER_REGISTRY-}web
+    build:
+      context: .
+      dockerfile: Web/Dockerfile
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    environment:
+      DB_HOST: db
+#      DB_PORT: 3306
+      DB_DATABASE: cosmic
+      DB_USER: root
+      DB_PASS: 'Test123!'
+  proxy:
+    image: owasp/modsecurity-crs:nginx
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - web
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - ./my_db.cnf:/etc/mysql/conf.d/my_db.cnf
+#      - ./mysql_data:/var/lib/mysql
+    environment:
+        MARIADB_ROOT_PASSWORD: 'Test123!'
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -p'Test123!'"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+  pma:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 100:80
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      UPLOAD_LIMIT: 25M
